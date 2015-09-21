@@ -1,0 +1,6 @@
+name: ShiftStats
+version: 1.0.0-DEVELOPMENT-SNAPSHOT
+main: com.gmail.gogobebe2.shiftstats.ShiftStats
+description: Part of the Shift minigame. Syncs with a SQL database for statistics related to each player and implements an API for getting and setting new stats.
+author: William Bryant (gogobebe2)
+website: gogobebe2@gmail.com
