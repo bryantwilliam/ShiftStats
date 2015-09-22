@@ -1,0 +1,6 @@
+# SQL
+HostName: "sql.example.com"
+Port: "12345"
+Database: "shift_players"
+Username: "user"
+Password: "pass"
