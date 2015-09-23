@@ -121,8 +121,8 @@ public class ShiftStats extends JavaPlugin {
         return getEntry(COLUMN_INDEX_POINTS, playerUUID);
     }
 
-    public long getKills(UUID playerUUID, KillMethod... killMethods) throws SQLException, ClassNotFoundException {
-        return getEntry(COLUMN_INDEX_KILLS, playerUUID);
+    public long getKills(UUID playerUUID, KillMethod killMethod) throws SQLException, ClassNotFoundException {
+        return getEntry(killMethodToColumnIndex(killMethod), playerUUID);
     }
 
     public long getDeaths(UUID playerUUID) throws SQLException, ClassNotFoundException {
@@ -133,49 +133,49 @@ public class ShiftStats extends JavaPlugin {
         return getEntry(COLUMN_INDEX_ORES_MINED, playerUUID);
     }
 
-    public void addWins(UUID playerUUID, long newValue) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_WINS, playerUUID, newValue);
+    public void addWins(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
+        addToEntry(COLUMN_INDEX_WINS, playerUUID, value);
     }
 
-    public void addLosses(UUID playerUUID, long newValue) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_LOSSES, playerUUID, newValue);
+    public void addLosses(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
+        addToEntry(COLUMN_INDEX_LOSSES, playerUUID, value);
     }
 
-    public void addPoints(UUID playerUUID, long newValue) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_POINTS, playerUUID, newValue);
+    public void addPoints(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
+        addToEntry(COLUMN_INDEX_POINTS, playerUUID, value);
     }
 
-    public void addKills(UUID playerUUID, long newValue, KillMethod... killMethods) throws SQLException, ClassNotFoundException {
-        String COLUMN_INDEX;
+    public void addKills(UUID playerUUID, long value, KillMethod... killMethods) throws SQLException, ClassNotFoundException {
         for (KillMethod killMethod : killMethods) {
-            switch (killMethod) {
-                case BOW:
-                    COLUMN_INDEX = COLUMN_INDEX_KILLS_WITH_BOW;
-                    break;
-                case SWORD:
-                    COLUMN_INDEX = COLUMN_INDEX_KILLS_WITH_SWORD;
-                    break;
-                case VOID:
-                    COLUMN_INDEX = COLUMN_INDEX_KILLS_WITH_VOID;
-                    break;
-                case OTHER:
-                default:
-                    COLUMN_INDEX = COLUMN_INDEX_KILLS_WITH_OTHER;
-            }
-            addToEntry(COLUMN_INDEX, playerUUID, newValue);
+            addToEntry(killMethodToColumnIndex(killMethod), playerUUID, value);
         }
-        addToEntry(COLUMN_INDEX_KILLS, playerUUID, newValue);
+        addToEntry(COLUMN_INDEX_KILLS, playerUUID, value);
     }
 
-    public void addDeaths(UUID playerUUID, long newValue) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_DEATHS, playerUUID, newValue);
+    public void addDeaths(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
+        addToEntry(COLUMN_INDEX_DEATHS, playerUUID, value);
     }
 
-    public void addOresMined(UUID playerUUID, long newValue) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_ORES_MINED, playerUUID, newValue);
+    public void addOresMined(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
+        addToEntry(COLUMN_INDEX_ORES_MINED, playerUUID, value);
+    }
+
+    private String killMethodToColumnIndex(KillMethod killMethod) {
+        switch (killMethod) {
+            case BOW:
+                return COLUMN_INDEX_KILLS_WITH_BOW;
+            case SWORD:
+                return COLUMN_INDEX_KILLS_WITH_SWORD;
+            case VOID:
+                return COLUMN_INDEX_KILLS_WITH_VOID;
+            case OTHER:
+                return COLUMN_INDEX_KILLS_WITH_OTHER;
+            case ALL: default:
+                return COLUMN_INDEX_KILLS;
+        }
     }
 
     public enum KillMethod {
-        BOW, SWORD, VOID, OTHER
+        BOW, SWORD, VOID, OTHER, ALL
     }
 }
