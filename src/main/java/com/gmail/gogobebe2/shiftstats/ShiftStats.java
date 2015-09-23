@@ -38,7 +38,7 @@ public class ShiftStats extends JavaPlugin {
     }
 
     private void setupDatabase() {
-        final String CONFIG_PATH_HOSTNAME = "HostName";
+        final String CONFIG_PATH_HOSTNAME = "Hostname";
         final String CONFIG_PATH_PORT = "Port";
         final String CONFIG_PATH_DATABASE = "Database";
         final String CONFIG_PATH_USERNAME = "Username";

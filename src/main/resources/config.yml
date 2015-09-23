@@ -1,5 +1,5 @@
 # SQL
-HostName: "sql.example.com"
+Hostname: "sql.example.com"
 Port: 12345
 Database: "shift"
 Username: "user"
