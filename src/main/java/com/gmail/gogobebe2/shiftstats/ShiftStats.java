@@ -38,11 +38,11 @@ public class ShiftStats extends JavaPlugin {
     }
 
     private void setupDatabase() {
-        String CONFIG_PATH_HOSTNAME = "HostName";
-        String CONFIG_PATH_PORT = "Port";
-        String CONFIG_PATH_DATABASE = "Database";
-        String CONFIG_PATH_USERNAME = "Username";
-        String CONFIG_PATH_PASSWORD = "Password";
+        final String CONFIG_PATH_HOSTNAME = "HostName";
+        final String CONFIG_PATH_PORT = "Port";
+        final String CONFIG_PATH_DATABASE = "Database";
+        final String CONFIG_PATH_USERNAME = "Username";
+        final String CONFIG_PATH_PASSWORD = "Password";
 
         database = new MySQL(this,
                 getConfig().getString(CONFIG_PATH_HOSTNAME),
