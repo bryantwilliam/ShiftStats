@@ -170,7 +170,7 @@ public class ShiftStats extends JavaPlugin {
                 return COLUMN_INDEX_KILLS_WITH_VOID;
             case OTHER:
                 return COLUMN_INDEX_KILLS_WITH_OTHER;
-            case ALL: default:
+            case ALL : default:
                 return COLUMN_INDEX_KILLS;
         }
     }
