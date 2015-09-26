@@ -108,12 +108,13 @@ public class ShiftStats extends JavaPlugin {
     private void addToEntry(UUID playerUUID, final String COLUMN_INDEX, String value, boolean exists) throws SQLException, ClassNotFoundException {
         Statement statement = safelyCreateStatement();
         if (exists) {
-            statement.executeUpdate("INSERT INTO `" + TABLE_NAME + "` (`" + COLUMN_INDEX_UUID + "`, `" + COLUMN_INDEX + "`) " +
-                    "VALUES ('" + playerUUID + "', '" + value + "');");
-        } else {
             statement.executeUpdate("UPDATE `" + TABLE_NAME + "` " +
                     "SET `" + COLUMN_INDEX + "` = '" + value + "' " +
                     "WHERE `" + COLUMN_INDEX_UUID + "` = '" + playerUUID.toString() + "';");
+
+        } else {
+            statement.executeUpdate("INSERT INTO `" + TABLE_NAME + "` (`" + COLUMN_INDEX_UUID + "`, `" + COLUMN_INDEX + "`) " +
+                    "VALUES ('" + playerUUID + "', '" + value + "');");
         }
     }
 
@@ -126,20 +127,25 @@ public class ShiftStats extends JavaPlugin {
     private void addToLongEntry(UUID playerUUID, final String COLUMN_INDEX, long addition) throws SQLException, ClassNotFoundException {
         long oldValue = getLongEntry(playerUUID, COLUMN_INDEX);
         long newValue = oldValue + addition;
-        addToEntry(playerUUID, COLUMN_INDEX, String.valueOf(newValue), oldValue == 0);
+        addToEntry(playerUUID, COLUMN_INDEX, String.valueOf(newValue), oldValue != 0);
     }
 
     public String[] getKits(UUID playerUUID) throws SQLException, ClassNotFoundException {
         return getEntry(playerUUID, COLUMN_INDEX_KITS, String[].class);
     }
 
-    public void addKits(UUID playerUUID, String[] kits) throws SQLException, ClassNotFoundException {
+    public void addKit(UUID playerUUID, String kit) throws SQLException, ClassNotFoundException {
         StringBuilder string = new StringBuilder();
-        for (int i = 0; i < kits.length; i++) {
-            string.append(kits[i]);
-            if (i != kits.length - 1) string.append(",");
+        String[] kits = getEntry(playerUUID, COLUMN_INDEX_KITS, String[].class);
+        boolean exists = kits != null;
+        if (exists) {
+            for (int i = 0; i < kits.length; i++) {
+                string.append(kits[i]);
+                if (i != kits.length - 1) string.append(",");
+            }
         }
-        addToEntry(playerUUID, COLUMN_INDEX_KITS, string.toString(), getEntry(playerUUID, COLUMN_INDEX_KITS, String[].class) == null);
+        string.append(kit);
+        addToEntry(playerUUID, COLUMN_INDEX_KITS, string.toString(), exists);
     }
 
     public long getWins(UUID playerUUID) throws SQLException, ClassNotFoundException {
@@ -203,7 +209,8 @@ public class ShiftStats extends JavaPlugin {
                 return COLUMN_INDEX_KILLS_WITH_VOID;
             case OTHER:
                 return COLUMN_INDEX_KILLS_WITH_OTHER;
-            case ALL : default:
+            case ALL:
+            default:
                 return COLUMN_INDEX_KILLS;
         }
     }
