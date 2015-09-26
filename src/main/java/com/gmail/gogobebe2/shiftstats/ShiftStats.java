@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public class ShiftStats extends JavaPlugin {
     private MySQL database;
+    private static ShiftStats API;
 
     private final static String TABLE_NAME = "shift_players";
     private final static String COLUMN_INDEX_UUID = "UUID";
@@ -24,11 +25,16 @@ public class ShiftStats extends JavaPlugin {
     private final static String COLUMN_INDEX_DEATHS = "Deaths";
     private final static String COLUMN_INDEX_ORES_MINED = "OresMined";
 
+    public static ShiftStats getAPI() {
+        return API;
+    }
+
     @Override
     public void onEnable() {
         getLogger().info("Starting up " + this.getName() + ". If you need me to update this plugin, email at gogobebe2@gmail.com");
         saveDefaultConfig();
         setupDatabase();
+        API = this;
     }
 
     @Override
