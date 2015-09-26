@@ -100,12 +100,8 @@ public class ShiftStats extends JavaPlugin {
                 "SELECT " + COLUMN_INDEX + " FROM `" + TABLE_NAME + "` "
                         + "WHERE `" + COLUMN_INDEX_UUID + "` = '" + playerUUID.toString() + "';");
         if (!resultSet.next()) return null;
-        if (type.isAssignableFrom(Long.class)) {
-            return type.cast(resultSet.getLong(COLUMN_INDEX));
-        }
-        else if (type.isInstance(String[].class)) {
-            return type.cast(resultSet.getString(COLUMN_INDEX).split(","));
-        }
+        if (type.isAssignableFrom(Long.class)) return type.cast(resultSet.getLong(COLUMN_INDEX));
+        else if (type.isInstance(String[].class)) return type.cast(resultSet.getString(COLUMN_INDEX).split(","));
         else throw new IllegalArgumentException("You can only use Longs or String[] as types!");
     }
 
