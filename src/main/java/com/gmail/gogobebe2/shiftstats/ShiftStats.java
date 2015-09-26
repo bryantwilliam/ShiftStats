@@ -24,6 +24,7 @@ public class ShiftStats extends JavaPlugin {
     private final static String COLUMN_INDEX_KILLS = "Kills";
     private final static String COLUMN_INDEX_DEATHS = "Deaths";
     private final static String COLUMN_INDEX_ORES_MINED = "OresMined";
+    private final static String COLUMN_INDEX_KITS = "Kits";
 
     public static ShiftStats getAPI() {
         return API;
@@ -70,7 +71,8 @@ public class ShiftStats extends JavaPlugin {
                             "`" + COLUMN_INDEX_KILLS_WITH_OTHER + "` BIGINT," +
                             "`" + COLUMN_INDEX_KILLS + "` BIGINT," +
                             "`" + COLUMN_INDEX_DEATHS + "` BIGINT," +
-                            "`" + COLUMN_INDEX_ORES_MINED + "` BIGINT)"
+                            "`" + COLUMN_INDEX_ORES_MINED + "` BIGINT," +
+                            "`" + COLUMN_INDEX_KITS + "` TEXT)"
             );
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -93,77 +95,106 @@ public class ShiftStats extends JavaPlugin {
         return database.getConnection().createStatement();
     }
 
-    private long getEntry(final String COLUMN_INDEX, UUID playerUUID) throws SQLException, ClassNotFoundException {
+    private <TYPE> TYPE getEntry(UUID playerUUID, final String COLUMN_INDEX, Class<TYPE> type) throws SQLException, ClassNotFoundException, IllegalArgumentException {
         ResultSet resultSet = safelyCreateStatement().executeQuery(
                 "SELECT " + COLUMN_INDEX + " FROM `" + TABLE_NAME + "` "
                         + "WHERE `" + COLUMN_INDEX_UUID + "` = '" + playerUUID.toString() + "';");
-        if (!resultSet.next()) return 0;
-        return resultSet.getLong(COLUMN_INDEX);
+        if (!resultSet.next()) return null;
+        if (type.isAssignableFrom(Long.class)) {
+            return type.cast(resultSet.getLong(COLUMN_INDEX));
+        }
+        else if (type.isInstance(String[].class)) {
+            return type.cast(resultSet.getString(COLUMN_INDEX).split(","));
+        }
+        else throw new IllegalArgumentException("You can only use Longs or String[] as types!");
     }
 
-    private void addToEntry(final String COLUMN_INDEX, UUID playerUUID, long addition) throws SQLException, ClassNotFoundException {
+    private void addToEntry(UUID playerUUID, final String COLUMN_INDEX, String value, boolean exists) throws SQLException, ClassNotFoundException {
         Statement statement = safelyCreateStatement();
-        long oldValue = getEntry(COLUMN_INDEX, playerUUID);
-        long newValue = oldValue + addition;
-        if (oldValue == 0) {
+        if (exists) {
             statement.executeUpdate("INSERT INTO `" + TABLE_NAME + "` (`" + COLUMN_INDEX_UUID + "`, `" + COLUMN_INDEX + "`) " +
-                    "VALUES ('" + playerUUID + "', '" + newValue + "');");
+                    "VALUES ('" + playerUUID + "', '" + value + "');");
         } else {
             statement.executeUpdate("UPDATE `" + TABLE_NAME + "` " +
-                    "SET `" + COLUMN_INDEX + "` = '" + newValue + "' " +
+                    "SET `" + COLUMN_INDEX + "` = '" + value + "' " +
                     "WHERE `" + COLUMN_INDEX_UUID + "` = '" + playerUUID.toString() + "';");
         }
     }
 
+    private long getLongEntry(UUID playerUUID, final String COLUMN_INDEX) throws SQLException, ClassNotFoundException {
+        Long result = getEntry(playerUUID, COLUMN_INDEX, Long.class);
+        if (result == null) return 0;
+        else return result;
+    }
+
+    private void addToLongEntry(UUID playerUUID, final String COLUMN_INDEX, long addition) throws SQLException, ClassNotFoundException {
+        long oldValue = getLongEntry(playerUUID, COLUMN_INDEX);
+        long newValue = oldValue + addition;
+        addToEntry(playerUUID, COLUMN_INDEX, String.valueOf(newValue), oldValue == 0);
+    }
+
+    public String[] getKits(UUID playerUUID) throws SQLException, ClassNotFoundException {
+        return getEntry(playerUUID, COLUMN_INDEX_KITS, String[].class);
+    }
+
+    public void addKits(UUID playerUUID, String[] kits) throws SQLException, ClassNotFoundException {
+        StringBuilder string = new StringBuilder();
+        for (int i = 0; i < kits.length; i++) {
+            string.append(kits[i]);
+            if (i != kits.length - 1) string.append(",");
+        }
+        addToEntry(playerUUID, COLUMN_INDEX_KITS, string.toString(), getEntry(playerUUID, COLUMN_INDEX_KITS, String[].class) == null);
+    }
+
     public long getWins(UUID playerUUID) throws SQLException, ClassNotFoundException {
-        return getEntry(COLUMN_INDEX_WINS, playerUUID);
+        return getLongEntry(playerUUID, COLUMN_INDEX_WINS);
     }
 
     public long getLosses(UUID playerUUID) throws SQLException, ClassNotFoundException {
-        return getEntry(COLUMN_INDEX_LOSSES, playerUUID);
+        return getLongEntry(playerUUID, COLUMN_INDEX_LOSSES);
     }
 
     public long getPoints(UUID playerUUID) throws SQLException, ClassNotFoundException {
-        return getEntry(COLUMN_INDEX_POINTS, playerUUID);
+        return getLongEntry(playerUUID, COLUMN_INDEX_POINTS);
     }
 
     public long getKills(UUID playerUUID, KillMethod killMethod) throws SQLException, ClassNotFoundException {
-        return getEntry(killMethodToColumnIndex(killMethod), playerUUID);
+        return getLongEntry(playerUUID, killMethodToColumnIndex(killMethod));
     }
 
     public long getDeaths(UUID playerUUID) throws SQLException, ClassNotFoundException {
-        return getEntry(COLUMN_INDEX_DEATHS, playerUUID);
+        return getLongEntry(playerUUID, COLUMN_INDEX_DEATHS);
     }
 
     public long getOresMined(UUID playerUUID) throws SQLException, ClassNotFoundException {
-        return getEntry(COLUMN_INDEX_ORES_MINED, playerUUID);
+        return getLongEntry(playerUUID, COLUMN_INDEX_ORES_MINED);
     }
 
     public void addWins(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_WINS, playerUUID, value);
+        addToLongEntry(playerUUID, COLUMN_INDEX_WINS, value);
     }
 
     public void addLosses(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_LOSSES, playerUUID, value);
+        addToLongEntry(playerUUID, COLUMN_INDEX_LOSSES, value);
     }
 
     public void addPoints(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_POINTS, playerUUID, value);
+        addToLongEntry(playerUUID, COLUMN_INDEX_POINTS, value);
     }
 
     public void addKills(UUID playerUUID, long value, KillMethod... killMethods) throws SQLException, ClassNotFoundException {
         for (KillMethod killMethod : killMethods) {
-            addToEntry(killMethodToColumnIndex(killMethod), playerUUID, value);
+            addToLongEntry(playerUUID, killMethodToColumnIndex(killMethod), value);
         }
-        addToEntry(COLUMN_INDEX_KILLS, playerUUID, value);
+        addToLongEntry(playerUUID, COLUMN_INDEX_KILLS, value);
     }
 
     public void addDeaths(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_DEATHS, playerUUID, value);
+        addToLongEntry(playerUUID, COLUMN_INDEX_DEATHS, value);
     }
 
     public void addOresMined(UUID playerUUID, long value) throws SQLException, ClassNotFoundException {
-        addToEntry(COLUMN_INDEX_ORES_MINED, playerUUID, value);
+        addToLongEntry(playerUUID, COLUMN_INDEX_ORES_MINED, value);
     }
 
     private String killMethodToColumnIndex(KillMethod killMethod) {
