@@ -1,5 +1,5 @@
 name: ShiftStats
-version: 1.5.0-DEVELOPMENT-SNAPSHO
+version: 1.5.1-DEVELOPMENT-SNAPSHO
 main: com.gmail.gogobebe2.shiftstats.ShiftStats
 description: Part of the Shift minigame. Syncs with a SQL database for statistics related to each player and implements an API for getting and setting new stats.
 author: William Bryant (gogobebe2)

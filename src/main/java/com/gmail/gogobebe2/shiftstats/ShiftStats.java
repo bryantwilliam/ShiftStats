@@ -72,7 +72,7 @@ public class ShiftStats extends JavaPlugin {
                             "`" + COLUMN_INDEX_KILLS + "` BIGINT," +
                             "`" + COLUMN_INDEX_DEATHS + "` BIGINT," +
                             "`" + COLUMN_INDEX_ORES_MINED + "` BIGINT," +
-                            "`" + COLUMN_INDEX_KITS + "` TEXT)"
+                            "`" + COLUMN_INDEX_KITS + "` TEXT);"
             );
 
         } catch (SQLException | ClassNotFoundException e) {
