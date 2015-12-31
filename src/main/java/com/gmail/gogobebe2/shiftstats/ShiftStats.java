@@ -32,10 +32,10 @@ public class ShiftStats extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        API = this;
         getLogger().info("Starting up " + this.getName() + ". If you need me to update this plugin, email at gogobebe2@gmail.com");
         saveDefaultConfig();
         setupDatabase();
-        API = this;
     }
 
     @Override
