@@ -101,8 +101,14 @@ public class ShiftStats extends JavaPlugin {
                         + "WHERE `" + COLUMN_INDEX_UUID + "` = '" + playerUUID.toString() + "';");
         if (!resultSet.next()) return null;
         if (type == Long.class) return type.cast(resultSet.getLong(COLUMN_INDEX));
-        else if (type == String[].class) return type.cast(resultSet.getString(COLUMN_INDEX).split(","));
-        else throw new IllegalArgumentException("You can only use Longs or String[] as types!");
+        else if (type == String[].class) {
+            String[] result = new String[]{};
+            try {
+                result = resultSet.getString(COLUMN_INDEX).split(",");
+            }
+            catch (NullPointerException ignored) {}
+            return type.cast(result);
+        } else throw new IllegalArgumentException("You can only use Longs or String[] as types!");
     }
 
     private void addToEntry(UUID playerUUID, final String COLUMN_INDEX, String value, boolean exists) throws SQLException, ClassNotFoundException {
