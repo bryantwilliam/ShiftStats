@@ -141,17 +141,12 @@ public class ShiftStats extends JavaPlugin {
     }
 
     public void addKit(UUID playerUUID, String kit) throws SQLException, ClassNotFoundException {
-        StringBuilder string = new StringBuilder();
+        StringBuilder entry = new StringBuilder();
         String[] kits = getEntry(playerUUID, COLUMN_INDEX_KITS, String[].class);
-        boolean exists = kits != null;
-        if (exists) {
-            for (int i = 0; i < kits.length; i++) {
-                string.append(kits[i]);
-                if (i != kits.length - 1) string.append(",");
-            }
-        }
-        string.append(kit);
-        addToEntry(playerUUID, COLUMN_INDEX_KITS, string.toString(), exists);
+        boolean exists = kits != null && kits.length != 0;
+        if (exists) for (String kitID : kits) entry.append(kitID + ",");
+        entry.append(kit);
+        addToEntry(playerUUID, COLUMN_INDEX_KITS, entry.toString(), exists);
     }
 
     public long getWins(UUID playerUUID) throws SQLException, ClassNotFoundException {
