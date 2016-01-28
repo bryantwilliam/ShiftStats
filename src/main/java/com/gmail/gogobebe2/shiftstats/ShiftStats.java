@@ -26,6 +26,7 @@ public class ShiftStats extends JavaPlugin {
     private final static String COLUMN_INDEX_ORES_MINED = "OresMined";
     private final static String COLUMN_INDEX_KITS = "Kits";
 
+    @SuppressWarnings("unused")
     public static ShiftStats getAPI() {
         return API;
     }
@@ -120,7 +121,7 @@ public class ShiftStats extends JavaPlugin {
 
         } else {
             statement.executeUpdate("INSERT INTO `" + TABLE_NAME + "` (`" + COLUMN_INDEX_UUID + "`, `" + COLUMN_INDEX + "`) " +
-                    "VALUES ('" + playerUUID + "', '" + value + "');");
+                    "VALUES ('" + playerUUID.toString() + "', '" + value + "');");
         }
     }
 
@@ -144,7 +145,7 @@ public class ShiftStats extends JavaPlugin {
         StringBuilder entry = new StringBuilder();
         String[] kits = getEntry(playerUUID, COLUMN_INDEX_KITS, String[].class);
         boolean exists = kits != null && kits.length != 0;
-        if (exists) for (String kitID : kits) entry.append(kitID + ",");
+        if (exists) for (String kitID : kits) entry.append(kitID).append(",");
         entry.append(kit);
         addToEntry(playerUUID, COLUMN_INDEX_KITS, entry.toString(), exists);
     }

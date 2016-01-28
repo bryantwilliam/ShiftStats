@@ -6,7 +6,7 @@
 
     <groupId>com.gmail.gogobebe2</groupId>
     <artifactId>ShiftStats</artifactId>
-    <version>1.5.6-DEVELOPMENT-SNAPSHOT</version>
+    <version>1.5.7-DEVELOPMENT-SNAPSHOT</version>
 
     <build>
         <pluginManagement>
